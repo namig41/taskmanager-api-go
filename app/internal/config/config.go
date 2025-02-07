@@ -1,8 +1,8 @@
 package config
 
 import (
+	"fmt"
 	"log"
-	"os"
 
 	"github.com/ilyakaznacheev/cleanenv"
 )
@@ -17,15 +17,20 @@ type Config struct {
 	}
 }
 
+func (c *Config) GetDatabaseDSN() string {
+	return fmt.Sprintf(
+		"postgresql://%s:%s@%s:%s/%s?sslmode=disable",
+		c.DatabaseConfig.User,
+		c.DatabaseConfig.Password,
+		c.DatabaseConfig.Host,
+		c.DatabaseConfig.Port,
+		c.DatabaseConfig.Name,
+	)
+}
+
 func LoadConfig() (*Config, error) {
 	log.Print("Read config")
 	var cfg Config
-
-	os.Setenv("POSTGRES_USER", "admin")
-	os.Setenv("POSTGRES_PASSWORD", "admin")
-	os.Setenv("POSTGRES_DB", "task_manager")
-	os.Setenv("POSTGRES_HOST", "localhost")
-	os.Setenv("POSTGRES_PORT", "5432")
 
 	if err := cleanenv.ReadEnv(&cfg); err != nil {
 		return nil, err

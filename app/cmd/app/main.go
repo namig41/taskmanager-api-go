@@ -1,11 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"net/http"
+	"taskmanager/app/internal/api"
 	"taskmanager/app/internal/config"
+	"taskmanager/app/internal/container"
 	"taskmanager/app/internal/domain/task"
-	"taskmanager/app/internal/repository"
 )
 
 func main() {
@@ -14,15 +15,20 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Print(cfg)
+	deps := container.InitContainer(cfg)
 
-	// Создаем репозиторий
-	repo := repository.NewMemoryTaskRepository()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	// Тестируем добавление задачи
 	task1 := task.Task{Id: 1, Name: "Test Task 1"}
 
-	repo.AddTask(task1)
+	deps.TaskRepository.AddTask(task1)
 
-	_, _ = repo, task1
+	r := api.Routes()
+
+	log.Println("Server starting on :8080")
+	if err := http.ListenAndServe(":8080", r); err != nil {
+		log.Fatalf("Server failed: %v", err)
+	}
 }

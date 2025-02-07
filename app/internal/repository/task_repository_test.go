@@ -8,15 +8,12 @@ import (
 )
 
 func TestMemoryTaskRepository(t *testing.T) {
-	// Создаем репозиторий
 	repo := NewMemoryTaskRepository()
 
-	// Тестируем добавление задачи
 	task1 := task.Task{Id: 1, Name: "Test Task 1"}
 	err := repo.AddTask(task1)
 	assert.Nil(t, err, "AddTask should not return error")
 
-	// Тестируем получение задачи по ID
 	t.Run("GetTaskById", func(t *testing.T) {
 		t.Run("task exists", func(t *testing.T) {
 			foundTask, err := repo.GetTaskById(1)

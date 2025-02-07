@@ -1,5 +1,9 @@
 APP_BIN = app/build/app
 
+MIGRATE_BIN = $(shell which migrate)
+DB_URL = "${DATABASE_PROVIDER}://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_DB}?sslmode=disable"
+
+
 build: clean $(APP_BIN)
 
 $(APP_BIN):
@@ -18,11 +22,8 @@ clean:
 swagger:
 	swag init -g ./app/cmd/app/main.go -o ./app/docs
 
-migrate:
-	$(APP_BIN) migrate -version $(version)
+migrate.up:
+	$(MIGRATE_BIN) -path ./migrations -database $(DB_URL) up
 
 migrate.down:
-	$(APP_BIN) migrate -seq down
-
-migrate.up:
-	$(APP_BIN) migrate -seq up
+	$(MIGRATE_BIN) -path ./migrations -database $(DB_URL) down 1
